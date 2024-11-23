@@ -2,38 +2,46 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-const features = [
-  {
-    id: "industry-experts",
-    title: "Industry Experts",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-  {
-    id: "dedicated-team",
-    title: "Dedicated Team",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-  {
-    id: "outcome-focused",
-    title: "Outcome Focused",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-  {
-    id: "high-quality",
-    title: "High Quality Service",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-  {
-    id: "cyber-security",
-    title: "Cyber Security Expert",
-    description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-  },
-];
+interface FeatureDropdownItem {
+  id: number;
+  title: string;
+  content: string;
+}
+
+const BASE_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export default function AnimatedFeatures() {
-  const [activeFeature, setActiveFeature] = useState(features[0]);
+  const [activeFeature, setActiveFeature] =
+    useState<FeatureDropdownItem | null>(null);
+  const [features, setFeatures] = useState<FeatureDropdownItem[]>([]);
+
+  useEffect(() => {
+    async function fetchFeatures() {
+      try {
+        const response = await fetch(`${BASE_URL}/api/feature-dropdowns-items`);
+        if (response.ok) {
+          const data = await response.json();
+          setFeatures(data.data);
+          setActiveFeature(data.data[0]);
+        } else {
+          console.error("Error fetching features:", response.status);
+        }
+      } catch (error) {
+        console.error("Error fetching features:", error);
+      }
+    }
+    fetchFeatures();
+  }, []);
+
+  if (!features.length || !activeFeature) {
+    return (
+      <div className="w-screen h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto px-4 py-16">
@@ -73,7 +81,7 @@ export default function AnimatedFeatures() {
                 <h4 className="text-2xl font-semibold mb-4">
                   {activeFeature.title}
                 </h4>
-                <p className="text-rose-100">{activeFeature.description}</p>
+                <p className="text-rose-100">{activeFeature?.content}</p>
               </div>
             </motion.div>
           </div>
@@ -85,8 +93,8 @@ export default function AnimatedFeatures() {
           >
             <div className="bg-gray-100 rounded-full overflow-hidden w-[450px] h-[450px]">
               <Image
-                src="https://imgv3.fotor.com/images/slider-image/A-clear-close-up-photo-of-a-woman.jpg"
-                alt="Feature illustration"
+                src={`${BASE_URL}/uploads/img1_ac85cebac2.webp`}
+                alt={"Feature illustration"}
                 width={500}
                 height={500}
                 className="w-full h-full object-cover"
@@ -114,7 +122,7 @@ export default function AnimatedFeatures() {
                   {activeFeature.title}
                 </h4>
                 <p className="text-sm sm:text-base text-rose-100">
-                  {activeFeature.description}
+                  {activeFeature.content}
                 </p>
               </div>
             </motion.div>
@@ -127,8 +135,8 @@ export default function AnimatedFeatures() {
           >
             <div className="bg-gray-100 rounded-full overflow-hidden w-[180px] h-[180px] sm:w-[250px] sm:h-[250px] lg:w-[350px] lg:h-[350px]">
               <Image
-                src="https://imgv3.fotor.com/images/slider-image/A-clear-close-up-photo-of-a-woman.jpg"
-                alt="Feature illustration"
+                src={`${BASE_URL}/uploads/img1_ac85cebac2.webp`}
+                alt={"Feature illustration"}
                 width={500}
                 height={500}
                 className="w-full h-full object-cover"
